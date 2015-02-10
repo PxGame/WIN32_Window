@@ -129,6 +129,16 @@ LRESULT WINAPI OnDestroy_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 LRESULT WINAPI OnEraseBkgnd_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+
+	RECT wndRect;
+	if (!GetWindowRect(hWnd, &wndRect))
+	{
+		return 0;
+	}
+
+	HDC hDev = (HDC)wParam;
+
+
 	return DefWindowProc(hWnd, WM_ERASEBKGND, wParam, lParam);
 }
 
