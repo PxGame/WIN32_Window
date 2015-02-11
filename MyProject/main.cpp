@@ -3,6 +3,8 @@
 LPCTSTR g_lptszClassName = TEXT("WndClass");
 const int g_nScrWidth = GetSystemMetrics(SM_CXSCREEN);
 const int g_nScrHeight = GetSystemMetrics(SM_CYSCREEN);
+const int g_nTktBorder = 10;
+const int g_nCapBorder = 20;
 
 HWND g_hMainWnd = NULL;
 
@@ -154,69 +156,66 @@ LRESULT WINAPI OnLbuttonDown_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	int width = wndRect.right - wndRect.left;
 	int height = wndRect.bottom - wndRect.top;
-
-	int borderWidth = 10;
-	int  captionHeight = 50;
-
+	
 	if (//标题栏
-		point.x > borderWidth && point.x < (width - borderWidth) &&
-		point.y > borderWidth && point.y <= captionHeight
+		point.x > g_nTktBorder && point.x < (width - g_nTktBorder) &&
+		point.y > g_nTktBorder && point.y <= g_nCapBorder + g_nTktBorder
 		)
 	{
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, lParam);
 	}
 	else if (//在窗口水平边框的上方
-		point.x > borderWidth && point.x < (width - borderWidth) &&
-		point.y >= 0 && point.y <= borderWidth
+		point.x > g_nTktBorder && point.x < (width - g_nTktBorder) &&
+		point.y >= 0 && point.y <= g_nTktBorder
 		)
 	{
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTTOP, lParam);
 	}
 	else if (//在窗口的水平边框的底部
-		point.x > borderWidth && point.x < (width - borderWidth) &&
-		point.y >= (height - borderWidth) && point.y <= height
+		point.x > g_nTktBorder && point.x < (width - g_nTktBorder) &&
+		point.y >= (height - g_nTktBorder) && point.y <= height
 		)
 	{
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTBOTTOM, lParam);
 	}
 	else if (//在窗口的左边框上 
-		point.x >= 0 && point.x <= borderWidth &&
-		point.y > borderWidth && point.y < (height - borderWidth)
+		point.x >= 0 && point.x <= g_nTktBorder &&
+		point.y > g_nTktBorder && point.y < (height - g_nTktBorder)
 		)
 	{
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTLEFT, lParam);
 	}
 	else if (// 在窗口的右边框上
-		point.x >= (width - borderWidth) && point.x <= width &&
-		point.y > borderWidth && point.y < (height - borderWidth)
+		point.x >= (width - g_nTktBorder) && point.x <= width &&
+		point.y > g_nTktBorder && point.y < (height - g_nTktBorder)
 		)
 	{
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTRIGHT, lParam);
 	}
 	else if (//在窗口边框的左上角
-		point.x >= 0 && point.x <= borderWidth &&
-		point.y >= 0 && point.y <= borderWidth
+		point.x >= 0 && point.x <= g_nTktBorder &&
+		point.y >= 0 && point.y <= g_nTktBorder
 		)
 	{
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTTOPLEFT, lParam);
 	}
 	else if (//在窗口边框的左下角
-		point.x >= 0 && point.x <= borderWidth &&
-		point.y >= (height - borderWidth) && point.y <= height
+		point.x >= 0 && point.x <= g_nTktBorder &&
+		point.y >= (height - g_nTktBorder) && point.y <= height
 		)
 	{
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTBOTTOMLEFT, lParam);
 	}
 	else if (//在窗口边框的右上角
-		point.x >= (width - borderWidth) && point.x <= width &&
-		point.y >= 0 && point.y <= borderWidth
+		point.x >= (width - g_nTktBorder) && point.x <= width &&
+		point.y >= 0 && point.y <= g_nTktBorder
 		)
 	{
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTTOPRIGHT, lParam);
 	}
 	else if (//在窗口边框的右下角
-		point.x >= (width - borderWidth) && point.x <= width &&
-		point.y >= (height - borderWidth) && point.y <= height
+		point.x >= (width - g_nTktBorder) && point.x <= width &&
+		point.y >= (height - g_nTktBorder) && point.y <= height
 		)
 	{
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTBOTTOMRIGHT, lParam);
@@ -249,15 +248,18 @@ LRESULT WINAPI OnEraseBkgnd_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	GetClientRect(hWnd, &wndRect);
 
 	HDC hdc = (HDC)wParam;
-	
+	//边框
 	FillRect(hdc, &wndRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
-	wndRect.left += 10;
-	wndRect.top += 10;
-	wndRect.right -= 10;
-	wndRect.bottom -= 10;
+
+	//非边框区
+	wndRect.left += g_nTktBorder;
+	wndRect.top += g_nTktBorder;
+	wndRect.right -= g_nTktBorder;
+	wndRect.bottom -= g_nTktBorder;
 	FillRect(hdc, &wndRect, (HBRUSH)GetStockObject(WHITE_BRUSH));
 
-	wndRect.bottom = 50;
+	//标题栏
+	wndRect.bottom = g_nCapBorder + g_nTktBorder;
 	FillRect(hdc, &wndRect, (HBRUSH)GetStockObject(GRAY_BRUSH));
 
 	/*
