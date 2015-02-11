@@ -54,6 +54,8 @@ LRESULT CALLBACK WinMainProc(
 			return OnGetMinMaxInfo_MainWnd(hWnd, wParam, lParam);
 		case WM_LBUTTONDOWN:
 			return OnLbuttonDown_MainWnd(hWnd, wParam, lParam);
+		case WM_PAINT:
+			return OnPaint_MainWnd(hWnd, wParam, lParam);
 		}
 	}
 
@@ -66,14 +68,14 @@ bool InitApplication(
 	WNDCLASS wnd;
 	wnd.cbClsExtra = 0;
 	wnd.cbWndExtra = 0;
-	wnd.hbrBackground = CreateSolidBrush(RGB(200, 200, 200));
+	wnd.hbrBackground = CreateSolidBrush(RGB(255, 255, 255));
 	wnd.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wnd.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wnd.hInstance = hInstance;
 	wnd.lpfnWndProc = WinMainProc;
 	wnd.lpszClassName = g_lptszClassName;
 	wnd.lpszMenuName = NULL;
-	wnd.style = 0;
+	wnd.style = CS_HREDRAW | CS_VREDRAW;//重要！！要不然背景绘制会出问题
 
 	if (! RegisterClass(&wnd))
 	{
@@ -127,21 +129,6 @@ LRESULT WINAPI OnDestroy_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-LRESULT WINAPI OnEraseBkgnd_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
-{
-
-	RECT wndRect;
-	if (!GetWindowRect(hWnd, &wndRect))
-	{
-		return 0;
-	}
-
-	HDC hDev = (HDC)wParam;
-
-
-	return DefWindowProc(hWnd, WM_ERASEBKGND, wParam, lParam);
-}
-
 LRESULT WINAPI OnGetMinMaxInfo_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PMINMAXINFO minmax = NULL;
@@ -160,7 +147,7 @@ LRESULT WINAPI OnLbuttonDown_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	point.y = HIWORD(lParam);
 	
 	RECT wndRect;
-	if (! GetWindowRect(hWnd, &wndRect))
+	if (! GetClientRect(hWnd, &wndRect))
 	{
 		return 0;
 	}
@@ -239,6 +226,51 @@ LRESULT WINAPI OnLbuttonDown_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCLIENT, lParam);		
 	}
 
-
 	return 0;
+}
+
+LRESULT WINAPI OnPaint_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	/*
+	PAINTSTRUCT ps;
+	HDC hdc = NULL;
+	hdc = BeginPaint(hWnd, &ps);
+
+	EndPaint(hWnd, &ps);
+	*/
+	return DefWindowProc(hWnd, WM_PAINT, wParam, lParam);
+}
+
+
+LRESULT WINAPI OnEraseBkgnd_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	RECT wndRect;
+	//GetWindowRect(hWnd, &wndRect);//错误，不能获取窗口大小，否则会失败。
+	GetClientRect(hWnd, &wndRect);
+
+	HDC hdc = (HDC)wParam;
+	
+	FillRect(hdc, &wndRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
+	wndRect.left += 10;
+	wndRect.top += 10;
+	wndRect.right -= 10;
+	wndRect.bottom -= 10;
+	FillRect(hdc, &wndRect, (HBRUSH)GetStockObject(WHITE_BRUSH));
+
+	wndRect.bottom = 50;
+	FillRect(hdc, &wndRect, (HBRUSH)GetStockObject(GRAY_BRUSH));
+
+	/*
+	HDC bufHdc = CreateCompatibleDC(hdc);
+	FillRect(bufHdc, &wndRect, (HBRUSH)GetStockObject(BLACK_BRUSH));
+	wndRect.left += 10;
+	wndRect.top += 10;
+	wndRect.right -= 10;
+	wndRect.bottom -= 10;
+	FillRect(bufHdc, &wndRect, (HBRUSH)GetStockObject(WHITE_BRUSH));
+	StretchBlt(hdc, wndRect.left, wndRect.top, wndRect.right, wndRect.bottom,
+		bufHdc, wndRect.left, wndRect.top, wndRect.right, wndRect.bottom, SRCCOPY);
+	DeleteDC(bufHdc);
+	*/
+	return  1;// DefWindowProc(hWnd, WM_ERASEBKGND, wParam, lParam);//返回非零表示擦除背景
 }
