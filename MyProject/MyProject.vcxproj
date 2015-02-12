@@ -15,6 +15,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MyProject.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AA122FD9-FCB3-486A-8876-F6C090C54383}</ProjectGuid>
