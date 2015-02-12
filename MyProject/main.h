@@ -32,6 +32,7 @@ LRESULT WINAPI OnPaint_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam);
 LRESULT WINAPI OnSize_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam);
 LRESULT WINAPI OnDrawItem_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam);
 LRESULT WINAPI OnMoveMouse_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam);
+LRESULT WINAPI OnCommand_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 
 # endif

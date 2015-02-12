@@ -8,7 +8,7 @@ const int g_nTktBorder = 3;
 const int g_nCapBorder = 20;
 const int g_nUserBorder = 120;
 const RECT g_rtInitCliWnd = { 0, 0, 280, 700 };
-const POINT g_ptMinWnd = { 280, 500 };
+const POINTS g_ptMinWnd = { 280, 500 };
 
 HINSTANCE g_hInstance = NULL;
 HWND g_hMainWnd = NULL;
@@ -70,6 +70,9 @@ LRESULT CALLBACK WinMainProc(
 		return OnDrawItem_MainWnd(hWnd, wParam, lParam);
 	case WM_MOUSEMOVE:
 		return OnMoveMouse_MainWnd(hWnd, wParam, lParam);
+	case WM_COMMAND:
+		return OnCommand_MainWnd(hWnd, wParam, lParam);
+
 	}
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -252,7 +255,6 @@ LRESULT WINAPI OnPaint_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, WM_PAINT, wParam, lParam);
 }
 
-
 LRESULT WINAPI OnEraseBkgnd_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 
@@ -351,7 +353,6 @@ LRESULT WINAPI OnEraseBkgnd_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return  1;// DefWindowProc(hWnd, WM_ERASEBKGND, wParam, lParam);//返回非零表示擦除背景
 }
 
-
 LRESULT WINAPI OnCreate_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 
@@ -398,14 +399,24 @@ LRESULT WINAPI OnDrawItem_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	{
 
 		//用于按钮绘制的DC
-		HDC dc = pDrawSt->hDC;
+		HDC hdc = pDrawSt->hDC;
+		HBRUSH brush = NULL;
 
 		//判断按钮各种状态的BOOL值
-		BOOL bIsPressed = (pDrawSt->itemState & ODS_SELECTED);
-		BOOL bIsFocused = (pDrawSt->itemState & ODS_FOCUS);
-		BOOL bIsDisabled = (pDrawSt->itemState & ODS_DISABLED);
-		BOOL bDrawFocusRect = !(pDrawSt->itemState & ODS_NOFOCUSRECT);
+		BOOL bIsPressed = (pDrawSt->itemState & ODS_SELECTED);//按下
 		RECT itemRect = pDrawSt->rcItem; //按钮的矩形区域
+
+		if (bIsPressed)
+		{
+			brush = CreateSolidBrush(RGB(255, 0, 0));
+			FillRect(hdc, &itemRect, brush);
+		}
+		else
+		{
+			brush = CreateSolidBrush(RGB(0, 204, 255));
+			FillRect(hdc, &itemRect, brush);
+		}
+		DeleteObject(brush);
 
 	}
 		return TRUE;
@@ -413,7 +424,6 @@ LRESULT WINAPI OnDrawItem_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	return DefWindowProc(hWnd, WM_DRAWITEM, wParam, lParam);
 }
-
 
 LRESULT WINAPI OnMoveMouse_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
@@ -475,6 +485,21 @@ LRESULT WINAPI OnMoveMouse_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	else
 	{
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
+	}
+
+	return 0;
+}
+
+LRESULT WINAPI OnCommand_MainWnd(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	UINT uId = LOWORD(wParam);
+	UINT uEvent = HIWORD(wParam);
+
+	switch (uId)
+	{
+	case IDC_BTN_CLOSE:
+		SendMessage(hWnd, WM_CLOSE, 0, 0);
+		break;
 	}
 
 	return 0;
